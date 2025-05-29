@@ -8,6 +8,7 @@ BASE_DIR=Path(__file__).resolve().parent
 #Image Paths:
 iqs_icon1=BASE_DIR/"icons"/"iqs-icon.png"
 iqs_icon2=BASE_DIR/"icons"/"iqs-icon-2.png"
+iqs_icon3=BASE_DIR/"icons"/"iqs-icon-3.png"
 modules_icons=BASE_DIR/"icons"/"modules-icons.png"
 closes_reminder=BASE_DIR/"icons"/"close-reminder-icon.png"
 mm_module_icon2=BASE_DIR/"icons"/"mm-module-icon2.png"
@@ -38,7 +39,10 @@ def open_iqs():
     try:
         iqs_icon=pa.locateOnScreen(str(iqs_icon1),confidence=0.9)
     except ImageNotFoundException:
-        iqs_icon=pa.locateOnScreen(str(iqs_icon2),confidence=0.9)
+        try:
+            iqs_icon=pa.locateOnScreen(str(iqs_icon2),confidence=0.9)
+        except ImageNotFoundException:
+            iqs_icon=pa.locateOnScreen(str(iqs_icon3),confidence=0.9)
     pa.moveTo(iqs_icon)
     pa.doubleClick()
     pa.hotkey('win','d')
@@ -51,8 +55,8 @@ def open_iqs():
             module_icon=None
             sleep(5)
             attempts+=1
-            if attempts>10:
-                print('mais de 10 tentativas realizadas!')
+            if attempts>20:
+                print('mais de 20 tentativas realizadas!')
                 break
         if module_icon:
             opened_iqs = True

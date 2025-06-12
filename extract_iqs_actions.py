@@ -82,10 +82,14 @@ def open_mm_module(module_icon):
         pa.click(module_icon)
         mm_module_ok=wait_image(str(employee_icon2))
         if mm_module_ok:
-            our_actions=(320,414)
-            pa.moveTo(our_actions)
-            pa.click()
-            sleep(2)
+            organizations=(202,417)
+            folder=(36,248)
+            enercon=(117,270)
+            close_organizations=(276,174)
+            pa.click(organizations)
+            pa.click(folder)
+            pa.doubleClick(enercon)
+            pa.click(close_organizations)
 def export_table():
     sleep(4)
     table_option=(1198,243)

@@ -33,7 +33,7 @@ INPUT_PATH  = Path(sys.argv[1]) if len(sys.argv) > 1 else Path(
     r"C:\Users\00071228\OneDrive - ENERCON\QA Team - Follow up - Qualidade - databases\actions_db.xlsx"
 )
 OUTPUT_PATH = Path(sys.argv[2]) if len(sys.argv) > 2 else Path(
-    f"C:/Users/00071228/OneDrive - ENERCON/QA Team - Follow up - Qualidade - databases/PDFs_Reports/actions_report_W{iso_week:02d}.pdf"
+    f"C:/Users/00071228/OneDrive - ENERCON/QA Team - Follow up - Qualidade - databases/PDFs_Reports/actions_report_W{iso_week:02d}"
     )
 
 # ---------- TRANSFORMAÇÕES ---------- #
@@ -216,9 +216,9 @@ def transformar_dataframe(df,type="all"):
 
 
 # ---------- GERADOR DE PDF (ReportLab) ---------- #
-def df_to_pdf(df: pd.DataFrame, pdf_path: Path):
+def df_to_pdf(df: pd.DataFrame, pdf_path: Path, type='all'):
     doc = SimpleDocTemplate(
-        str(pdf_path),
+        str(f'{pdf_path}_{type}.pdf'),
         pagesize=landscape(A4),
         leftMargin=18,
         rightMargin=18,

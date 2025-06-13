@@ -32,7 +32,9 @@ iso_year, iso_week,_=today.isocalendar()
 INPUT_PATH  = Path(sys.argv[1]) if len(sys.argv) > 1 else Path(
     r"C:\Users\00071228\OneDrive - ENERCON\QA Team - Follow up - Qualidade - databases\actions_db.xlsx"
 )
-OUTPUT_PATH = Path(sys.argv[2]) if len(sys.argv) > 2 else Path(f"C:/Users/00071228/OneDrive - ENERCON/QA Team - Follow up - Qualidade - databases/PDFs_Reports/actions_report_W{iso_week:02d}.pdf")
+OUTPUT_PATH = Path(sys.argv[2]) if len(sys.argv) > 2 else Path(
+    f"C:/Users/00071228/OneDrive - ENERCON/QA Team - Follow up - Qualidade - databases/PDFs_Reports/actions_report_W{iso_week:02d}.pdf"
+    )
 
 # ---------- TRANSFORMAÇÕES ---------- #
 def excel_serial_to_date(x):
@@ -43,7 +45,7 @@ def excel_serial_to_date(x):
     return pd.to_datetime(x, errors="coerce").date()
 
 
-def transformar_dataframe(df):
+def transformar_dataframe(df,type="all"):
     # Mesmas regras que você já usava  -------------------------
     cols_orig = [
         "Status", "Title", "Description", "Planned end", "Actual end", "Created on",
@@ -117,15 +119,47 @@ def transformar_dataframe(df):
     # Mostra só as linhas em aberto (já faz parte do seu script)
     df = df[df["Status"].isin(["In progress", "Unprocessed"])]
     # Filtrar as colunas que são da ENERCON:
-    mascara_linked=(
+    if type=="all":
+        mascara_linked=(
         df['Vinculado a']
         .fillna('')
         .str.contains(
-            r'ENERCON GmbH \(91200000\)|Marinho',
+            r'ENERCON GmbH \(91200000\)| General actions',
             case=False,
             regex=True
-        )
-    )
+            )
+                        )
+    elif type=="kaizen":
+        mascara_linked=(
+        df['Vinculado a']
+        .fillna('')
+        .str.contains(
+            r'General actions',
+            case=False,
+            regex=True
+            )
+                        )
+    elif type=="rkm":
+        mascara_linked=(
+        df['Vinculado a']
+        .fillna('')
+        .str.contains(
+            r'ENERCON GmbH \(91200000\)',
+            case=False,
+            regex=True
+            )
+                        )
+    else:
+        mascara_linked=(
+        df['Vinculado a']
+        .fillna('')
+        .str.contains(
+            r'ENERCON GmbH \(91200000\)| General actions',
+            case=False,
+            regex=True
+            )
+                        )         
+               
     df=df[mascara_linked]
 
     criadores_ok = [

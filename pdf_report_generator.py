@@ -198,7 +198,7 @@ def transformar_dataframe(df,type="all"):
     df["Descrição"] = df["Descrição"].astype(str).apply(lambda s: wrap(s, 60))
     # Limpeza dos caracteres estranhos dentro dos textos
     df["Título"]=(df["Título"].
-                  str.replace(r'(?i)_x000d_','',regex=True).
+                  str.replace(r'_x000d_','',regex=True).
                   str.replace(r'[\r\n]+','',regex=True).
                   str.replace(r'\s{2,}','',regex=True).
                   str.strip()
@@ -259,9 +259,16 @@ def df_to_pdf(df: pd.DataFrame, pdf_path: Path, type='all'):
 # ------------------------------ MAIN ------------------------------ #
 def main():
     print(f"📄 Lendo: {INPUT_PATH}")
+    choice=input("Escolha quais ações precisa gerar relatório: 1- Todas as ações | 2- Ações Kaizen | 3- Ações RKMs:\n\n Escreva o número:")
+    if choice=='1':
+        type='all'
+    if choice=='2':
+        type='kaizen'
+    if choice=='3':
+        type='rkm'
     df_raw = pd.read_excel(INPUT_PATH, sheet_name="Sheet")
-    df_tratado = transformar_dataframe(df_raw)
-    df_to_pdf(df_tratado, OUTPUT_PATH)
+    df_tratado = transformar_dataframe(df_raw,type)
+    df_to_pdf(df_tratado, OUTPUT_PATH,type)
     print(f"✅ PDF gerado em: {OUTPUT_PATH.resolve()}")
 
 

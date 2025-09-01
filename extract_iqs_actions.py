@@ -27,7 +27,8 @@ working_list_icon= BASE_DIR/"icons"/"working_list.png"
 update_icon= BASE_DIR/"icons"/"update.png"
 options_icon= BASE_DIR/"icons"/"options_icons.png"
 excel_icon=BASE_DIR/"icons"/"excel_icon.png"
-
+all_modules_icon=BASE_DIR/"icons"/"all-modules.png"
+mm_module_icon3=BASE_DIR/"icons"/"mm-module-icon3.png"
 pa.PAUSE=0.5
 pa.FAILSAFE=True
 
@@ -69,25 +70,32 @@ def open_iqs():
                 break
         if module_icon:
             opened_iqs = True
-    return module_icon
-def open_mm_module(module_icon):
-    if module_icon:
-        pa.moveTo(module_icon)
-        pa.click()
-        sleep(2)
-        close_reminder=wait_image(str(closes_reminder))
-        pa.moveTo(close_reminder)
+
+def open_mm_module():
+
+    all_modules=pa.locateOnScreen(str(all_modules_icon),confidence=0.9)
+    
+    if all_modules:
+        pa.moveTo(all_modules)
         pa.click()
         sleep(2)
         try:
-            mm_module=wait_image(str(mm_module_icon2))
+            close_reminder=wait_image(str(closes_reminder))
+            pa.moveTo(close_reminder)
+            pa.click()
+            sleep(2)
+        except:
+            pass
+        try:
+            mm_module=wait_image(str(mm_module_icon3))
         except ImageNotFoundException:
-            mm_module=wait_image(str(mm_module_icon1))
+            mm_module=wait_image(str(mm_module_icon2))
         pa.click(mm_module)
         try:
             wait_image(str(employee_icon1))
         except ImageNotFoundException:
             pass
+        module_icon=pa.locateOnScreen(str(modules_icons),confidence=0.9)
         pa.click(module_icon)
         mm_module_ok=wait_image(str(employee_icon2))
         if mm_module_ok:
@@ -191,6 +199,7 @@ def qi_module():
             options=wait_image(str(options_icon))
         except ImageNotFoundException:
             print("icone de options não encontrado.")
+    sleep(1)
     pa.click(options)
     excel=wait_image(str(excel_icon))
     pa.click(excel)
@@ -228,9 +237,10 @@ def close_iqs():
     
 
 def main():
-    step1=open_iqs()
-    open_mm_module(step1)
+    # open_iqs()
+    open_mm_module()
     export_table()
+    sleep(2)
     qi_module()
     close_iqs()
 

@@ -16,8 +16,8 @@ mm_module_icon1=BASE_DIR/"icons"/"MM-module-icon.png"
 employee_icon1=BASE_DIR/"icons"/"employee-icon.png"
 employee_icon2=BASE_DIR/"icons"/"mm-module-icon2.png"
 export_option=BASE_DIR/"icons"/"export-options.png"
-qi_icon_w=BASE_DIR/"icons"/"qi_icon_w.png"
-qi_icon_g=BASE_DIR/"icons"/"qi_icon_g.png"
+qi_icon_ns=BASE_DIR/"icons"/"qi_mm_ns.png"
+qi_icon_s=BASE_DIR/"icons"/"qi_mm_s.png"
 reports_icon=BASE_DIR/"icons"/"reports.png"
 analysis_icon=BASE_DIR/"icons"/"show_a.png"
 search_icon=BASE_DIR/"icons"/"search_icon.png"
@@ -28,7 +28,11 @@ update_icon= BASE_DIR/"icons"/"update.png"
 options_icon= BASE_DIR/"icons"/"options_icons.png"
 excel_icon=BASE_DIR/"icons"/"excel_icon.png"
 all_modules_icon=BASE_DIR/"icons"/"all-modules.png"
-mm_module_icon3=BASE_DIR/"icons"/"mm-module-icon3.png"
+mm_module_icon3v1=BASE_DIR/"icons"/"mm-module-icon3v1.png"
+mm_module_icon3v2=BASE_DIR/"icons"/"mm-module-icon3v2.png"
+customize_icon=BASE_DIR/"icons"/"customize_icon.png"
+max_ribbon=BASE_DIR/"icons"/"maximize_ribbon_icon.png"
+general_icon=BASE_DIR/"icons"/"general_icon.png"
 pa.PAUSE=0.5
 pa.FAILSAFE=True
 
@@ -42,6 +46,18 @@ def wait_image(path,timeout=30,confidence=0.95):
         if loc:
             return pa.center(loc)
     raise ImageNotFoundException(f"Imagem '{path}' não apareceu em {timeout}s.")
+
+def _maximize_ribbon():
+    customize=pa.locateOnScreen(str(customize_icon))
+    pa.click(customize)
+    try:
+        maximize=pa.locateOnScreen(str(max_ribbon))
+        pa.click(maximize)
+    except ImageNotFoundException:
+        pa.click()
+        pass
+    else:
+        maximize=wait_image(str(max_ribbon))
 
 def open_iqs():
     pa.hotkey('win','d')
@@ -72,11 +88,9 @@ def open_iqs():
             opened_iqs = True
 
 def open_mm_module():
-
-    all_modules=pa.locateOnScreen(str(all_modules_icon),confidence=0.9)
-    
-    if all_modules:
-        pa.moveTo(all_modules)
+        
+        module_icon=pa.locateOnScreen(str(modules_icons),confidence=0.9)
+        pa.moveTo(module_icon)
         pa.click()
         sleep(2)
         try:
@@ -86,10 +100,14 @@ def open_mm_module():
             sleep(2)
         except:
             pass
+        
+        _maximize_ribbon()    
+        all_modules=pa.locateOnScreen(str(all_modules_icon),confidence=0.9)
+        pa.click(all_modules)
         try:
-            mm_module=wait_image(str(mm_module_icon3))
+            mm_module=wait_image(str(mm_module_icon3v1))
         except ImageNotFoundException:
-            mm_module=wait_image(str(mm_module_icon2))
+            mm_module=wait_image(str(mm_module_icon3v2))
         pa.click(mm_module)
         try:
             wait_image(str(employee_icon1))
@@ -145,16 +163,24 @@ def export_table():
     pa.moveTo(finish_bt)
     pa.click()
     
-
 def qi_module():
+    _maximize_ribbon()
     module_icon=pa.locateOnScreen(str(modules_icons),confidence=0.9)
-    pa.doubleClick(module_icon)
     pa.click(module_icon)
+    # pa.click(module_icon)
+    all_modules=wait_image(str(all_modules_icon))
+    pa.click(all_modules)
     try:
-        qi_mm= wait_image(str(qi_icon_w))
+        qi_mm= wait_image(str(qi_icon_ns))
     except ImageNotFoundException:
-        qi_mm=wait_image(str(qi_icon_g))
+        qi_mm=wait_image(str(qi_icon_s))
     pa.doubleClick(qi_mm)
+
+    try:
+        general=wait_image(str(general_icon))
+        pa.click(general)
+    except ImageNotFoundException:
+        pass
     try:
         wait_image(str(reports_icon))
     except ImageNotFoundException:
@@ -230,14 +256,11 @@ def qi_module():
     pa.click()
     finish_bt=(1109,772)
     pa.moveTo(finish_bt)
-    pa.click()
-            
+    pa.click()            
 def close_iqs():
-    pa.click(1665,12,2,1)
-    
-
+    pa.click(1665,12,2,1)    
 def main():
-    # open_iqs()
+    open_iqs()
     open_mm_module()
     export_table()
     sleep(2)

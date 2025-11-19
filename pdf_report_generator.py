@@ -80,7 +80,7 @@ def transformar_dataframe(df,type="all"):
     }
     df.rename(columns=rename_map, inplace=True)
 
-    df = df[~df["Criador"].isin(["Costa, Pedro Alexandre", "Krause, Stefan"])]
+    df = df[~df["Criador"].isin(["Krause, Stefan"])]
     df = df[df["Status"].isin(["Completed", "In progress", "Unprocessed"])]
     df = df[df["Descrição"].notna()]
     df = df[~df["Descrição"].str.lower().str.startswith("complaint process")]
@@ -169,7 +169,8 @@ def transformar_dataframe(df,type="all"):
     'Pinto, Ricardo',
     'Pita, Liliana',
     'Sousa, Monica',   
-    'Vieira, Maria'
+    'Vieira, Maria',
+    'Costa, Pedro Alexandre'
     ]
     df= (
         df[df['Criador'].str.strip().isin(criadores_ok)]
@@ -269,7 +270,7 @@ def main():
     df_raw = pd.read_excel(INPUT_PATH, sheet_name="Sheet")
     df_tratado = transformar_dataframe(df_raw,type)
     df_to_pdf(df_tratado, OUTPUT_PATH,type)
-    print(f"✅ PDF gerado em: {OUTPUT_PATH.resolve()}")
+    print(f"✅ PDF gerado em: {OUTPUT_PATH.resolve()}.pdf")
 
 
 if __name__ == "__main__":

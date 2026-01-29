@@ -127,11 +127,11 @@ def open_mm_module():
             pa.click(close_organizations)
 def export_table():
     sleep(4)
-    table_option=(1198,243)
+    table_option=(1264,244)
     pa.moveTo(table_option)
     pa.click()
     sleep(2)
-    export_bt=(1264,244)
+    export_bt=(1260,382)
     pa.moveTo(export_bt)
     pa.click()
     #########

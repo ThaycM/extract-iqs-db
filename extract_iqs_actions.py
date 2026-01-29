@@ -131,7 +131,7 @@ def export_table():
     pa.moveTo(table_option)
     pa.click()
     sleep(2)
-    export_bt=(1260,382)
+    export_bt=(1264,244)
     pa.moveTo(export_bt)
     pa.click()
     #########

@@ -36,16 +36,34 @@ general_icon=BASE_DIR/"icons"/"general_icon.png"
 pa.PAUSE=0.5
 pa.FAILSAFE=True
 
-def wait_image(path,timeout=30,confidence=0.95):
+def wait_image(path,timeout=60,confidence=0.95):
     start = time()
     while time() - start < timeout:
         try:
             loc = pa.locateOnScreen(path, confidence=confidence, grayscale=True)
+            if loc:
+                return pa.center(loc)
         except ImageNotFoundException:
-            loc=None
-        if loc:
-            return pa.center(loc)
+            pass
+        sleep(0.5) # Prevent high CPU usage
     raise ImageNotFoundException(f"Imagem '{path}' não apareceu em {timeout}s.")
+
+def wait_any_image(paths, timeout=30, confidence=0.95):
+    """
+    Waits for ANY of the images in the list `paths` to appear.
+    Returns the center of the first one found.
+    """
+    start = time()
+    while time() - start < timeout:
+        for path in paths:
+            try:
+                loc = pa.locateOnScreen(path, confidence=confidence, grayscale=True)
+                if loc:
+                    return pa.center(loc)
+            except ImageNotFoundException:
+                pass
+        sleep(0.5)
+    raise ImageNotFoundException(f"Nenhuma das imagens {paths} apareceu em {timeout}s.")
 
 def _maximize_ribbon():
     customize=pa.locateOnScreen(str(customize_icon))
@@ -89,25 +107,28 @@ def open_iqs():
 
 def open_mm_module():
         
-        module_icon=pa.locateOnScreen(str(modules_icons),confidence=0.9)
+        module_icon=wait_image(str(modules_icons),confidence=0.9)
         pa.moveTo(module_icon)
         pa.click()
-        sleep(2)
+        # Replaced hard sleep with waiting for the reminder close button or just a short stabilization time if needed
+        # sleep(2) 
         try:
-            close_reminder=wait_image(str(closes_reminder))
+            close_reminder=wait_image(str(closes_reminder), timeout=5)
             pa.moveTo(close_reminder)
             pa.click()
-            sleep(2)
+            sleep(2) # Keep this short sleep after click to allow animation
         except:
             pass
         
         _maximize_ribbon()    
-        all_modules=pa.locateOnScreen(str(all_modules_icon),confidence=0.9)
+        all_modules=wait_image(str(all_modules_icon),confidence=0.9)
+        pa.click(all_modules)
         pa.click(all_modules)
         try:
-            mm_module=wait_image(str(mm_module_icon3v1))
+            mm_module = wait_any_image([str(mm_module_icon3v1), str(mm_module_icon3v2)], timeout=60)
         except ImageNotFoundException:
-            mm_module=wait_image(str(mm_module_icon3v2))
+            # If neither found, might fail or we could try one last time, but wait_any_image already waited.
+             raise
         pa.click(mm_module)
         try:
             wait_image(str(employee_icon1))
@@ -126,11 +147,22 @@ def open_mm_module():
             pa.doubleClick(enercon)
             pa.click(close_organizations)
 def export_table():
-    sleep(4)
+    # sleep(4) # Removed initial sleep, rely on UI elements appearing or calling function should handle it
+    # But if this is waiting for previous step, it's safer to wait for an element.
+    # Assuming we are on the screen where table_option is visible.
+    
     table_option=(1264,244)
+    # Since table_option is a coordinate, we can't wait for it visually unless we have an image.
+    # If the previous step `mm_module_ok=wait_image(...)` succeeded, we might be good.
+    sleep(2) # Reduced from 4, but should rely on state.
+    
     pa.moveTo(table_option)
     pa.click()
-    sleep(2)
+    
+    # sleep(2) # Replaced with wait for export_bt if it was an image, but it's a coord.
+    # Assuming export button appears after table option click.
+    sleep(2) 
+
     export_bt=(1260,382)
     pa.moveTo(export_bt)
     pa.click()
@@ -138,10 +170,14 @@ def export_table():
     next_1=(1013,773)
     pa.moveTo(next_1)
     pa.click()
-    file_options=pa.locateOnScreen(str(export_option))
-    if file_options:
+    
+    try:
+        file_options=wait_image(str(export_option), timeout=10)
         pa.moveTo(file_options)
         pa.click()
+    except ImageNotFoundException:
+        pass # Maybe it's already structured correctly or not found
+
     for _ in range(6):
         pa.press('tab')
     pa.press('enter')
@@ -165,7 +201,7 @@ def export_table():
     
 def qi_module():
     _maximize_ribbon()
-    module_icon=pa.locateOnScreen(str(modules_icons),confidence=0.9)
+    module_icon=wait_image(str(modules_icons),confidence=0.9)
     pa.click(module_icon)
     # pa.click(module_icon)
     all_modules=wait_image(str(all_modules_icon))
@@ -213,8 +249,8 @@ def qi_module():
         pass
     pa.doubleClick(working_list)
     pa.press("Enter")
-    sleep(2)
-    update= wait_image(str(update_icon),confidence=0.9)
+    # sleep(2) # Replace with wait for update_icon
+    update= wait_image(str(update_icon),confidence=0.9, timeout=60) # Increased timeout significantly for loading
     pa.click(update)
     pa.click(1463,444)
     try:

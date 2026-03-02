@@ -9,6 +9,8 @@ BASE_DIR=Path(__file__).resolve().parent
 iqs_icon1=BASE_DIR/"icons"/"iqs-icon.png"
 iqs_icon2=BASE_DIR/"icons"/"iqs-icon-2.png"
 iqs_icon3=BASE_DIR/"icons"/"iqs-icon-3.png"
+iqs_icon4=BASE_DIR/"icons"/"iqs-icon-4.png"
+open_iqs_taskbar=BASE_DIR/"icons"/"open-iqs-task-bar.png"
 modules_icons=BASE_DIR/"icons"/"modules-icons.png"
 closes_reminder=BASE_DIR/"icons"/"close-reminder-icon.png"
 mm_module_icon2=BASE_DIR/"icons"/"mm-module-icon2.png"
@@ -105,6 +107,21 @@ def open_iqs():
         if module_icon:
             opened_iqs = True
 
+    # Nova etapa: clicar no ícone da barra de tarefas para trazer a janela para frente
+    if opened_iqs:
+        try:
+            # Esperar um pouco pelo ícone aparecer na barra se ainda não estiver visivel
+            taskbar_icon = wait_image(str(iqs_icon4), timeout=60, confidence=0.8)
+            pa.click(taskbar_icon)
+            sleep(1) # tempo para o menu da barra de tarefas abrir
+            
+            # Clicar na miniatura / opção que abre a janela de fato
+            open_iqs_window = wait_image(str(open_iqs_taskbar), timeout=30, confidence=0.8)
+            pa.click(open_iqs_window)
+            sleep(1) # tempo para a janela vir para frente
+        except ImageNotFoundException:
+            print("Ícone da barra de tarefas ou miniatura não encontrados. A janela já pode estar em foco.")
+            
 def open_mm_module():
         
         module_icon=wait_image(str(modules_icons),confidence=0.9)
@@ -123,7 +140,8 @@ def open_mm_module():
         _maximize_ribbon()    
         all_modules=wait_image(str(all_modules_icon),confidence=0.9)
         pa.click(all_modules)
-        pa.click(all_modules)
+        sleep(1)
+        #pa.click(all_modules) - > retirado porque no sistema atual só é preciso um clique para abrir o menu
         try:
             mm_module = wait_any_image([str(mm_module_icon3v1), str(mm_module_icon3v2)], timeout=60)
         except ImageNotFoundException:

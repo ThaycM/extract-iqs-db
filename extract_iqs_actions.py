@@ -35,6 +35,9 @@ mm_module_icon3v2=BASE_DIR/"icons"/"mm-module-icon3v2.png"
 customize_icon=BASE_DIR/"icons"/"customize_icon.png"
 max_ribbon=BASE_DIR/"icons"/"maximize_ribbon_icon.png"
 general_icon=BASE_DIR/"icons"/"general_icon.png"
+all_actions=BASE_DIR/"icons"/"all_actions.png"
+atualizar_acoes=BASE_DIR/"icons"/"atualizar_acoes.png"
+waiting=BASE_DIR/"icons"/"waiting.png"
 pa.PAUSE=0.5
 pa.FAILSAFE=True
 
@@ -66,6 +69,22 @@ def wait_any_image(paths, timeout=30, confidence=0.95):
                 pass
         sleep(0.5)
     raise ImageNotFoundException(f"Nenhuma das imagens {paths} apareceu em {timeout}s.")
+
+def wait_while_loading(timeout=120, confidence=0.85):
+    """
+    Aguarda enquanto o ícone de 'waiting' (loading) estiver visível na tela.
+    Retorna quando o ícone desaparecer ou quando o timeout for atingido.
+    """
+    start = time()
+    while time() - start < timeout:
+        try:
+            pa.locateOnScreen(str(waiting), confidence=confidence, grayscale=True)
+            # Ícone ainda visível → continua esperando
+            sleep(0.5)
+        except ImageNotFoundException:
+            # Ícone sumiu → pode continuar
+            return
+    print(f"[wait_while_loading] Timeout de {timeout}s atingido, continuando mesmo assim.")
 
 def _maximize_ribbon():
     customize=pa.locateOnScreen(str(customize_icon))
@@ -165,6 +184,17 @@ def open_mm_module():
             pa.doubleClick(enercon)
             pa.click(close_organizations)
 def export_table():
+    wait_while_loading()
+    all_actions_icon=wait_image(str(all_actions),confidence=0.9)
+    pa.click(all_actions_icon)
+    wait_while_loading()
+    from_date=(297,236) 
+    pa.doubleClick(from_date)
+    pa.press('delete')
+    wait_while_loading()
+    atualizar_acoes_icon=wait_image(str(atualizar_acoes),confidence=0.9)
+    pa.click(atualizar_acoes_icon)
+    wait_while_loading()
     # sleep(4) # Removed initial sleep, rely on UI elements appearing or calling function should handle it
     # But if this is waiting for previous step, it's safer to wait for an element.
     # Assuming we are on the screen where table_option is visible.

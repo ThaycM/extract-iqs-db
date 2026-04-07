@@ -38,6 +38,7 @@ general_icon=BASE_DIR/"icons"/"general_icon.png"
 all_actions=BASE_DIR/"icons"/"all_actions.png"
 atualizar_acoes=BASE_DIR/"icons"/"atualizar_acoes.png"
 waiting=BASE_DIR/"icons"/"waiting.png"
+from_deleted=BASE_DIR/"icons"/"from_deleted.png"
 pa.PAUSE=0.5
 pa.FAILSAFE=True
 
@@ -188,13 +189,20 @@ def export_table():
     all_actions_icon=wait_image(str(all_actions),confidence=0.9)
     pa.click(all_actions_icon)
     wait_while_loading()
-    from_date=(297,236) 
-    pa.doubleClick(from_date)
-    pa.press('delete')
-    wait_while_loading()
+    from_date_ok=False
+    while not from_date_ok:
+        from_date=(297,236) 
+        pa.doubleClick(from_date)
+        pa.press('delete')
+        wait_while_loading()
+        from_deleted_icon=wait_image(str(from_deleted),confidence=0.9)
+        if from_deleted_icon:
+            from_date_ok=True
     atualizar_acoes_icon=wait_image(str(atualizar_acoes),confidence=0.9)
-    pa.click(atualizar_acoes_icon)
-    wait_while_loading()
+    for _ in range(2):
+        pa.click(atualizar_acoes_icon)
+        wait_while_loading()
+
     # sleep(4) # Removed initial sleep, rely on UI elements appearing or calling function should handle it
     # But if this is waiting for previous step, it's safer to wait for an element.
     # Assuming we are on the screen where table_option is visible.
